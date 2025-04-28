@@ -5,3 +5,4 @@ nodriver
 drissionpage
 setuptools
 dotenv
+python-telegram-bot
