@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 import subprocess
 import time
+import pkg_resources
 
 ThinkingMode = Literal['detailed', 'simple', 'disabled']
 SearchMode = Literal['enabled', 'disabled']
