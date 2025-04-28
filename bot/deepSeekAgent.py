@@ -46,7 +46,7 @@ def run_chat_example(api: DeepSeekAPI, title: str, prompt: str, thinking_enabled
 
 def main(prompt: str) -> str:
     try:
-        api = DeepSeekAPI("C1nmUpKbVPK9GLODTtTfbUJR5Yi+QcwenINR5ockYgr3njNY+dLxr/9E38htKOF9")
+        api = DeepSeekAPI("YOUR_TOKEN")
 
         # Улучшенный промпт
         system_prompt = (
