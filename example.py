@@ -66,7 +66,7 @@ def run_chat_example(api: DeepSeekAPI, title: str, prompt: str, thinking_enabled
 def main():
     try:
         # Initialize the API with your auth token
-        api = DeepSeekAPI(os.getenv("DEEPSEEK_AUTH_TOKEN"))
+        api = DeepSeekAPI("DEEPSEEK_AUTH_TOKEN")
 
         # # Example 1: With thinking and web search
         # run_chat_example(
