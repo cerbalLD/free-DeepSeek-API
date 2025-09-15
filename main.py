@@ -2,7 +2,7 @@ import json, os
 from setup_logger import setup_logger
 from crm.AmoCRM import AmoCRM
 from UserBot import UserBot
-from ai.deepseek import DeepSeek
+from ai.DeepSeek import DeepSeek
 
 def main():
     # запуск логов
