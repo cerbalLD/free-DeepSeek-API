@@ -10,19 +10,18 @@ from telethon import TelegramClient, events
 from telethon.tl.types import PeerUser, PeerChat, PeerChannel
 from telethon.errors import RPCError
 
-from dsk.api import DeepSeekAPI, AuthenticationError, RateLimitError, NetworkError, APIError
 
 # ----------------- НАСТРОЙКИ -----------------
 with open("config.json", "r", encoding="utf-8") as file:
     config = json.load(file)
 
-API_ID            = config['api_id']
-API_HASH          = config['api_hash']
-SESSION           = config['session_name']
-DEEPSEEK_KEY      = config['deepseek_token']
-SYSTEM_PROMPT     = config['system_promt']
-DEBOUNCE_SECONDS  = config['debounce_seconds']
-INACTIVITY_SECONDS = config.get('inactivity_seconds')
+API_ID             = config['api_id']
+API_HASH           = config['api_hash']
+SESSION            = config['session_name']
+DEEPSEEK_KEY       = config['deepseek_token']
+SYSTEM_PROMPT      = config['system_promt']
+DEBOUNCE_SECONDS   = config['debounce_seconds']
+INACTIVITY_SECONDS = config['inactivity_seconds']
 
 USERS_PICKLE = "users.pickle"
 
