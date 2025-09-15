@@ -2,12 +2,11 @@ from curl_cffi import requests
 from typing import Optional, Dict, Any, Generator, Literal
 import json
 from .pow import DeepSeekPOW
-import pkg_resources
+# import pkg_resources
 import sys
 from pathlib import Path
 import subprocess
 import time
-import pkg_resources
 
 ThinkingMode = Literal['detailed', 'simple', 'disabled']
 SearchMode = Literal['enabled', 'disabled']
@@ -45,14 +44,14 @@ class DeepSeekAPI:
         if not auth_token or not isinstance(auth_token, str):
             raise AuthenticationError("Invalid auth token provided")
 
-        try:
-            curl_cffi_version = pkg_resources.get_distribution('curl-cffi').version
-            if curl_cffi_version != '0.8.1b9':
-                print("\033[93mWarning: DeepSeek API requires curl-cffi version 0.8.1b9", file=sys.stderr)
-                print("Please install the correct version using: pip install curl-cffi==0.8.1b9\033[0m", file=sys.stderr)
-        except pkg_resources.DistributionNotFound:
-            print("\033[93mWarning: curl-cffi not found. Please install version 0.8.1b9:", file=sys.stderr)
-            print("pip install curl-cffi==0.8.1b9\033[0m", file=sys.stderr)
+        # try:
+        #     curl_cffi_version = pkg_resources.get_distribution('curl-cffi').version
+        #     if curl_cffi_version != '0.8.1b9':
+        #         print("\033[93mWarning: DeepSeek API requires curl-cffi version 0.8.1b9", file=sys.stderr)
+        #         print("Please install the correct version using: pip install curl-cffi==0.8.1b9\033[0m", file=sys.stderr)
+        # except pkg_resources.DistributionNotFound:
+        #     print("\033[93mWarning: curl-cffi not found. Please install version 0.8.1b9:", file=sys.stderr)
+        #     print("pip install curl-cffi==0.8.1b9\033[0m", file=sys.stderr)
 
         self.auth_token = auth_token
         self.pow_solver = DeepSeekPOW()
@@ -186,7 +185,7 @@ class DeepSeekAPI:
                     chat_session_id: str,
                     prompt: str,
                     parent_message_id: Optional[str] = None,
-                    thinking_enabled: bool = True,
+                    thinking_enabled: bool = False,
                     search_enabled: bool = False) -> Generator[Dict[str, Any], None, None]:
         """
         Send a message and get streaming response
@@ -247,20 +246,35 @@ class DeepSeekAPI:
                 else:
                     raise APIError(f"API request failed: {error_text}", response.status_code)
 
+            my_respounse = {
+                'next_parent_id': None,
+                'content': ''
+            }
+            
+            is_append = False
+            
             for chunk in response.iter_lines():
                 try:
-                    parsed = self._parse_chunk(chunk)
-                    if parsed:
-                        yield parsed
-                        if parsed.get('finish_reason') == 'stop':
-                            break
+                    if data := self._validate_chunk(chunk):
+                        if is_append:
+                            if isinstance(data['v'], str):
+                                my_respounse['content'] += data['v']
+                            elif data.get("o", "") == "BATCH":
+                                return my_respounse
+                        elif isinstance(data['v'], dict) and data.get('v', {}).get('response') is not None:
+                            my_respounse['next_parent_id'] = data.get('v', {}).get('response').get('message_id')
+                        elif not is_append and data.get("o", "") == "APPEND":
+                            my_respounse['content'] += data['v']
+                            is_append = True
+                                
+                        
                 except Exception as e:
                     raise APIError(f"Error parsing response chunk: {str(e)}")
-
+                
         except requests.exceptions.RequestException as e:
             raise NetworkError(f"Network error occurred during streaming: {str(e)}")
 
-    def _parse_chunk(self, chunk: bytes) -> Optional[Dict[str, Any]]:
+    def _validate_chunk(self, chunk: bytes) -> Optional[Dict[str, Any]]:
         """Parse a SSE chunk from the API response"""
         if not chunk:
             return None
@@ -268,17 +282,9 @@ class DeepSeekAPI:
         try:
             if chunk.startswith(b'data: '):
                 data = json.loads(chunk[6:])
-
-                if 'choices' in data and data['choices']:
-                    choice = data['choices'][0]
-                    if 'delta' in choice:
-                        delta = choice['delta']
-
-                        return {
-                            'content': delta.get('content', ''),
-                            'type': delta.get('type', ''),
-                            'finish_reason': choice.get('finish_reason')
-                        }
+                if 'v' in data and data['v']:
+                    return data
+                
         except json.JSONDecodeError:
             raise APIError("Invalid JSON in response chunk")
         except Exception as e:
