@@ -11,6 +11,7 @@
         "client_id": "f47219cb-3385-4acc-b27c-7af5da9f0398",
         "client_secret": "Uj9XnUdO75ZLFFuD4Ajv5aG5k9CCYEe6GwXepINjKMQ37y7KkxJBSaWOBKMPpeQO",
         "subdomain": "zvonok823515",
-        "redirect_url": "https://test.com"
+        "redirect_url": "https://test.com",
+        "pipline_id": 10091846
     }
 }
