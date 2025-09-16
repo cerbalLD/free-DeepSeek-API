@@ -12,9 +12,9 @@ USERS_PICKLE = "users.pickle"
 
 NUDGE_LIST = [
     "Можем продолжить?",
-    "Правильно понимаю, что можем двигаться дальше?",
+    "Вы еще тут?",
     "Еще актуально?",
-    "Xnj-то не понравилось?",
+    "Что-то не понравилось?",
 ]
 
 @dataclass
@@ -108,7 +108,6 @@ class UserBot():
         finally:
             state.inactivity_task = None
 
-    # ----------------- ДЕБАУНС -------------------
     async def debounce_and_reply(self, entity: PeerUser, user_id: int):
         """
         Ждем DEBOUNCE_SECONDS без новых сообщений, затем отправляем в ии.
@@ -185,8 +184,7 @@ class UserBot():
 
             user_id = self.get_peer_id(event)
             
-            # TODO: убрать защиту для вовы
-            if user_id != 253848239 or user_id < 0: return
+            if user_id < 0: return
             
             entity = await event.get_input_chat()
 

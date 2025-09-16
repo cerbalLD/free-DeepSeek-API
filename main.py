@@ -11,7 +11,7 @@ def main():
     logger.info("[main] Initialization started...")
     
     # загруска настроек
-    if not os.path.isfile("config.json"): 
+    if not os.path.isfile("config1.json"): 
         raise FileNotFoundError("File config.json not found")
 
     try:
@@ -71,7 +71,7 @@ def main():
     # user bot start
     try:
         logger.info("[main] Connection to Telegram...")
-        user_bot = UserBot(
+        UserBot(
             logger=logger,
             api_id=API_ID,
             api_hash=API_HASH,
